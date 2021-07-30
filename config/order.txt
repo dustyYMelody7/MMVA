@@ -1,0 +1,6 @@
+video_process: 0,1
+banner: 2
+logo: 3
+ocr: 4
+nsfw: 5
+face: 6

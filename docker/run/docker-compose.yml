@@ -1,0 +1,196 @@
+version: "3"
+
+services:
+  face:
+    image: video_filter:kalenforn
+    container_name: face
+    volumes:
+      - ./face/frProcess.py:/usr/local/src/project/frProcess.py
+      - ./config.cfg:/usr/local/src/project/config.cfg
+      # - ./common.cfg:/usr/local/src/project/common.cfg
+      - ./main.py:/usr/local/src/project/main.py
+      # 这一个一定要加，不知道哪里调用了这个model
+      - ../../recognition/face/model.py:/usr/local/src/project/model.py
+      - ../../recognition/face:/usr/local/src/project/face
+      - ../../utils:/usr/local/src/project/utils
+      - ../../log-docker:/usr/local/src/project/log
+      - ../../output-docker:/usr/local/src/project/output-docker
+    entrypoint: ["sh", "-c", "sleep 10 && python main.py"]
+    # restart: always
+    networks:
+      - mysql-network
+      - redis-network
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - capabilities: [ "gpu" ]
+              device_ids: [ "0", "1" ]
+              driver: nvidia
+  ocr:
+    image: video_filter:kalenforn
+    container_name: ocr
+    volumes:
+      - ./ocr/orProcess.py:/usr/local/src/project/orProcess.py
+      - ./config.cfg:/usr/local/src/project/config.cfg
+#      - ./common.cfg:/usr/local/src/project/common.cfg
+      - ./main.py:/usr/local/src/project/main.py
+      - ../../recognition/ocr:/usr/local/src/project/ocr
+      - ../../utils:/usr/local/src/project/utils
+      - ../../log-docker:/usr/local/src/project/log
+      - ../../output-docker:/usr/local/src/project/output-docker
+    entrypoint: ["sh", "-c", "sleep 10 && python main.py"]
+    # restart: always
+    networks:
+      - mysql-network
+      - redis-network
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - capabilities: [ "gpu" ]
+              device_ids: [ "0", "1" ]
+              driver: nvidia
+  nsfw:
+    image: video_filter:kalenforn
+    container_name: nsfw
+    volumes:
+      - ./nsfw/nrProcess.py:/usr/local/src/project/nrProcess.py
+      - ./config.cfg:/usr/local/src/project/config.cfg
+#      - ./common.cfg:/usr/local/src/project/common.cfg
+      - ./main.py:/usr/local/src/project/main.py
+      - ../../recognition/nsfw:/usr/local/src/project/nsfw
+      - ../../utils:/usr/local/src/project/utils
+      - ../../log-docker:/usr/local/src/project/log
+      - ../../output-docker:/usr/local/src/project/output-docker
+    entrypoint: ["sh", "-c", "sleep 10 && python main.py"]
+    # restart: always
+    networks:
+      - mysql-network
+      - redis-network
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - capabilities: [ "gpu" ]
+              device_ids: [ "0", "1" ]
+              driver: nvidia
+#  banner:
+#    image: video_filter:kalenforn
+#    container_name: banner
+#    volumes:
+#      - ./banner/brProcess.py:/usr/local/src/project/brProcess.py
+#      - ./config.cfg:/usr/local/src/project/config.cfg
+##      - ./common.cfg:/usr/local/src/project/common.cfg
+#      - ./main.py:/usr/local/src/project/main.py
+#      - ../../recognition/general_det:/usr/local/src/project/general_det
+#      - ../../utils:/usr/local/src/project/utils
+#      - ../../log-docker:/usr/local/src/project/log
+#      - ../../output-docker:/usr/local/src/project/output-docker
+#    entrypoint: ["sh", "-c", "sleep 10 && python main.py"]
+#    # restart: always
+#    networks:
+#      - mysql-network
+#      - redis-network
+#    deploy:
+#      resources:
+#        reservations:
+#          devices:
+#            - capabilities: [ "gpu" ]
+#              device_ids: [ "0", "1" ]
+#              driver: nvidia
+#  logo:
+#    image: video_filter:kalenforn
+#    container_name: logo
+#    volumes:
+#      - ./logo/lrProcess.py:/usr/local/src/project/lrProcess.py
+#      - ./config.cfg:/usr/local/src/project/config.cfg
+##      - ./common.cfg:/usr/local/src/project/common.cfg
+#      - ./main.py:/usr/local/src/project/main.py
+#      # - ../../recognition/logo:/usr/local/src/project/logo
+#      - ../../recognition/general_det:/usr/local/src/project/general_det
+#      - ../../utils:/usr/local/src/project/utils
+#      - ../../log-docker:/usr/local/src/project/log
+#      - ../../output-docker:/usr/local/src/project/output-docker
+#    entrypoint: ["sh", "-c", "sleep 10 && python main.py"]
+#    # restart: always
+#    networks:
+#      - mysql-network
+#      - redis-network
+#    deploy:
+#      resources:
+#        reservations:
+#          devices:
+#            - capabilities: [ "gpu" ]
+#              device_ids: [ "0", "1" ]
+#              driver: nvidia
+#  audio:
+#    image: video_process:kalenforn
+#    container_name: audio
+#    volumes:
+#      - ./audio/main.py:/usr/local/src/project/main.py
+#      - ./config.cfg:/usr/local/src/project/config.cfg
+#      #      - ./common.cfg:/usr/local/src/project/common.cfg
+#      - ../../audio:/usr/local/src/project/audio
+#      - ../../utils:/usr/local/src/project/utils
+#      - ../../log-docker:/usr/local/src/project/log
+#      - ../../output-docker:/usr/local/src/project/output-docker
+#    entrypoint: [ "sh", "-c", "sleep 10 && python main.py" ]
+#    networks:
+#      - redis-network
+#      - mysql-network
+  videoprocess:
+    image: video_process:kalenforn
+    container_name: videoprocess
+    volumes:
+      # video数据挂在位置
+      - /home/tujunfeng/video:/video
+      - ./video/main.py:/usr/local/src/project/main.py
+      - ./config.cfg:/usr/local/src/project/config.cfg
+#      - ./common.cfg:/usr/local/src/project/common.cfg
+      - ../../videoProcess:/usr/local/src/project/videoProcess
+      - ../../utils:/usr/local/src/project/utils
+      - ../../log-docker:/usr/local/src/project/log
+      - ../../output-docker:/usr/local/src/project/output-docker
+    # 等待mysql加载完数据
+    entrypoint: ["sh", "-c", "sleep 10 && python main.py"]
+    ports:
+      - 9933:9933
+    networks:
+      - redis-network
+      - mysql-network
+  redis:
+    image: redis:latest
+    container_name: redis
+    volumes:
+      - ./redis/redis.conf:/usr/local/etc/redis/redis.conf
+      # 不建议挂载，因为redis数据不是静态数据，即使丢失问题不大
+      # - ./redis/log/:/data
+    # restart: always
+    entrypoint: [ "docker-entrypoint.sh", "redis-server", "/usr/local/etc/redis/redis.conf" ]
+    networks:
+      - redis-network
+  mysql:
+    image: mysql:latest
+    container_name: mysql
+    volumes:
+      # mysql 数据存储在宿主机的路径
+      - ./mysql/store:/var/lib/mysql
+      ####### 这个挂在建议仅在 -->首次<-- docker-compose启动时挂在，因为上面的store会中保存结果，下次执行时会读取上面的内容
+      # - ./mysql/data.sql:/docker-entrypoint-initdb.d/data.sql
+    ports:
+      - 9932:3306
+    # restart: always
+    environment:
+      - MYSQL_USER=video_filter
+      - MYSQL_PASSWORD=lmc.T4.video.filter
+      - MYSQL_ROOT_PASSWORD=T4.mysql.server
+      - MYSQL_DATABASE=video_filter
+    networks:
+      - mysql-network
+
+networks:
+  mysql-network:
+    name: mysql-network
+  redis-network:
+    name: redis-network
